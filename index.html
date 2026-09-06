@@ -1,29 +1,87 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>حاسبة أسعار الذهب</title>
+    <!-- السطر ده مهم عشان الحاسبة تظهر بحجمها الطبيعي على شاشات الموبايل -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة أسعار الذهب | مجوهرات القدس</title>
+    <!-- استدعاء خط احترافي من جوجل -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; padding: 30px; max-width: 400px; margin: auto; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h2 { color: #d4af37; text-align: center; }
-        label { font-weight: bold; }
-        input { width: 100%; padding: 10px; margin: 10px 0 20px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
-        .result { font-size: 22px; font-weight: bold; color: #2c3e50; text-align: center; padding: 15px; background: #e8f6e9; border-radius: 5px; border: 1px solid #c8e6c9;}
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #121212; /* لون خلفية داكن فخم */
+            color: #d4af37; /* لون ذهبي للنصوص */
+            padding: 20px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .calculator-container {
+            background-color: #1e1e1e; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); 
+            max-width: 400px; 
+            width: 100%;
+            border: 1px solid #d4af37; /* إطار ذهبي خفيف */
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            max-width: 120px; /* حجم اللوجو */
+            border-radius: 10px;
+        }
+        h2 { text-align: center; margin-bottom: 25px; font-weight: 700; }
+        label { font-weight: bold; display: block; margin-bottom: 8px; color: #f5f5f5;}
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 20px; 
+            box-sizing: border-box; 
+            border: 1px solid #555; 
+            background-color: #2a2a2a;
+            color: #fff;
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-family: 'Cairo', sans-serif;
+        }
+        input:focus { outline: none; border-color: #d4af37; box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
+        .result { 
+            font-size: 22px; 
+            font-weight: 700; 
+            color: #121212; 
+            text-align: center; 
+            padding: 15px; 
+            background: linear-gradient(135deg, #d4af37, #f1c40f); /* تدرج لوني ذهبي */
+            border-radius: 8px; 
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h2>حاسبة مجوهرات القدس</h2>
-    
-    <label>سعر الجرام اليوم (جنيه):</label>
-    <input type="number" id="gramPrice" placeholder="مثال: 3500" oninput="calculate()">
+    <div class="calculator-container">
+        <div class="logo-container">
+            <!-- مسار اللوجو -->
+            <img src="logo.png" alt="مجوهرات القدس">
+        </div>
+        <h2>حاسبة الأسعار</h2>
+        
+        <label>سعر الجرام اليوم (جنيه):</label>
+        <input type="number" id="gramPrice" placeholder="مثال: 3500" oninput="calculate()">
 
-    <label>وزن القطعة (جرام):</label>
-    <input type="number" id="weight" placeholder="مثال: 15" oninput="calculate()">
+        <label>وزن القطعة (جرام):</label>
+        <input type="number" id="weight" placeholder="مثال: 15" oninput="calculate()">
 
-    <label>مصنعية الجرام (جنيه):</label>
-    <input type="number" id="makingCharge" placeholder="مثال: 150" oninput="calculate()">
+        <label>مصنعية الجرام (جنيه):</label>
+        <input type="number" id="makingCharge" placeholder="مثال: 150" oninput="calculate()">
 
-    <div class="result">الإجمالي: <span id="total">0</span> جنيه</div>
+        <div class="result">الإجمالي: <span id="total">0</span> جنيه</div>
+    </div>
 
     <script>
         function calculate() {
@@ -31,7 +89,6 @@
             let weight = parseFloat(document.getElementById('weight').value) || 0;
             let charge = parseFloat(document.getElementById('makingCharge').value) || 0;
             
-            // حساب الإجمالي: (سعر الجرام + المصنعية) × الوزن
             let total = (price + charge) * weight;
             
             document.getElementById('total').innerText = total.toLocaleString('ar-EG');
