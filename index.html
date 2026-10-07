@@ -318,8 +318,8 @@ function loadReferencePrice() {
   fetch('price.json?t=' + Date.now())
     .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
     .then(function(data) {
-      if (!data || !data.karat21_sell) return;
-      document.getElementById('refPriceValue').innerText = Math.round(data.karat21_sell).toLocaleString('ar-EG') + ' جنيه';
+      if (!data || !data.karat21_buy) return;
+      document.getElementById('refPriceValue').innerText = Math.round(data.karat21_buy).toLocaleString('ar-EG') + ' جنيه';
       document.getElementById('refPriceTime').innerText = 'آخر تحديث: ' + (data.updated_at_display || '');
       document.getElementById('refPrice').style.display = 'block';
     })
