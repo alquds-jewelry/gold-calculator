@@ -2,16 +2,14 @@
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <!-- السطر ده مهم عشان الحاسبة تظهر بحجمها الطبيعي على شاشات الموبايل -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>حاسبة أسعار الذهب | مجوهرات القدس</title>
-    <!-- استدعاء خط احترافي من جوجل -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: 'Cairo', sans-serif; 
-            background-color: #121212; /* لون خلفية داكن فخم */
-            color: #d4af37; /* لون ذهبي للنصوص */
+            background-color: #121212; 
+            color: #d4af37; 
             padding: 20px; 
             display: flex;
             justify-content: center;
@@ -26,22 +24,16 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.5); 
             max-width: 400px; 
             width: 100%;
-            border: 1px solid #d4af37; /* إطار ذهبي خفيف */
+            border: 1px solid #d4af37;
         }
-        .logo-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .logo-container img {
-            max-width: 120px; /* حجم اللوجو */
-            border-radius: 10px;
-        }
+        .logo-container { text-align: center; margin-bottom: 20px; }
+        .logo-container img { max-width: 120px; border-radius: 10px; }
         h2 { text-align: center; margin-bottom: 25px; font-weight: 700; }
         label { font-weight: bold; display: block; margin-bottom: 8px; color: #f5f5f5;}
-        input { 
+        
+        input, select { 
             width: 100%; 
             padding: 12px; 
-            margin-bottom: 20px; 
             box-sizing: border-box; 
             border: 1px solid #555; 
             background-color: #2a2a2a;
@@ -49,33 +41,57 @@
             border-radius: 8px; 
             font-size: 16px; 
             font-family: 'Cairo', sans-serif;
+            margin-bottom: 20px;
         }
-        input:focus { outline: none; border-color: #d4af37; box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
+        input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
+        
+        /* تنسيق خانة السعر والعيار جنب بعض */
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .input-group input, .input-group select { margin-bottom: 0; }
+        .input-group input { flex: 2; }
+        .input-group select { flex: 1; }
+
         .result { 
             font-size: 22px; 
             font-weight: 700; 
             color: #121212; 
             text-align: center; 
             padding: 15px; 
-            background: linear-gradient(135deg, #d4af37, #f1c40f); /* تدرج لوني ذهبي */
+            background: linear-gradient(135deg, #d4af37, #f1c40f); 
             border-radius: 8px; 
             margin-top: 10px;
         }
-    .social-links { margin-top: 25px; display: flex; justify-content: space-around; border-top: 1px solid #444; padding-top: 20px; }
-.social-links a { color: #d4af37; text-decoration: none; font-size: 15px; font-weight: bold; transition: 0.3s; }
-.social-links a:hover { color: #fff; }
+        
+        .note { font-size: 14px; color: #cccccc; text-align: center; margin-top: 25px; margin-bottom: -10px; line-height: 1.6; font-weight: bold; }
+        
+        .social-links { margin-top: 25px; display: flex; justify-content: space-around; border-top: 1px solid #444; padding-top: 20px; }
+        .social-links a { color: #d4af37; text-decoration: none; font-size: 15px; font-weight: bold; transition: 0.3s; }
+        .social-links a:hover { color: #fff; }
     </style>
 </head>
 <body>
     <div class="calculator-container">
         <div class="logo-container">
-            <!-- مسار اللوجو -->
             <img src="logo.png" alt="مجوهرات القدس">
         </div>
-        <h2>احسب سعر قطعتك في لحظة!</h2>
+        <h2>احسب سعر قطعتك</h2>
         
-        <label>سعر الجرام اليوم (جنيه):</label>
-        <input type="number" id="gramPrice" placeholder="مثال: 3500" oninput="calculate()">
+        <label>سعر الجرام الذي تعرفه:</label>
+        <div class="input-group">
+            <input type="number" id="enteredPrice" placeholder="السعر" oninput="calculate()">
+            <select id="enteredKarat" onchange="calculate()">
+                <option value="21">عيار 21</option>
+                <option value="24">عيار 24</option>
+                <option value="18">عيار 18</option>
+            </select>
+        </div>
+
+        <label>عيار القطعة المراد حسابها:</label>
+        <select id="targetKarat" onchange="calculate()">
+            <option value="18">عيار 18</option>
+            <option value="21" selected>عيار 21</option>
+            <option value="24">عيار 24</option>
+        </select>
 
         <label>وزن القطعة (جرام):</label>
         <input type="number" id="weight" placeholder="مثال: 15" oninput="calculate()">
@@ -84,23 +100,36 @@
         <input type="number" id="makingCharge" placeholder="مثال: 150" oninput="calculate()">
 
         <div class="result">الإجمالي: <span id="total">0</span> جنيه</div>
-  <div class="social-links">
-    <a href="https://www.facebook.com/Elquds.Jewellery" target="_blank">فيسبوك 📘</a>
-    <a href="https://www.instagram.com/alquds_jewellery/" target="_blank">إنستجرام 📸</a>
-      <a href="https://www.tiktok.com/@alquds.jewellery?lang=en" target="_blank">تيك توك 🎵</a>
-    <a href="https://wa.me/message/I2TDRNXENKNTJ1" target="_blank">واتساب 💬</a>
-</div>
+
+        <div class="note">
+            لمتابعة أسعار الذهب أول بأول ومعرفة أسعار المصنعيات - تواصلوا معانا على اللينكات دي:
+        </div>
+
+        <div class="social-links">
+            <a href="https://www.facebook.com/Elquds.Jewellery" target="_blank">فيسبوك 📘</a>
+            <a href="https://www.instagram.com/alquds_jewellery/" target="_blank">إنستجرام 📸</a>
+            <a href="https://www.tiktok.com/@alquds.jewellery?lang=en" target="_blank">تيك توك 🎵</a>
+            <a href="https://api.whatsapp.com/message/I2TDRNXENKNTJ1?autoload=1&app_absent=0">واتساب 💬</a>
+        </div>
     </div>
 
     <script>
         function calculate() {
-            let price = parseFloat(document.getElementById('gramPrice').value) || 0;
+            let enteredPrice = parseFloat(document.getElementById('enteredPrice').value) || 0;
+            let enteredKarat = parseFloat(document.getElementById('enteredKarat').value);
+            let targetKarat = parseFloat(document.getElementById('targetKarat').value);
+            
             let weight = parseFloat(document.getElementById('weight').value) || 0;
             let charge = parseFloat(document.getElementById('makingCharge').value) || 0;
             
-            let total = (price + charge) * weight;
+            // معادلة الصاغة: السعر المدخل ÷ العيار المدخل × عيار القطعة المطلوبة
+            let actualGramPrice = (enteredPrice / enteredKarat) * targetKarat;
             
-            document.getElementById('total').innerText = total.toLocaleString('ar-EG');
+            // حساب الإجمالي
+            let total = (actualGramPrice + charge) * weight;
+            
+            // تحديث النتيجة
+            document.getElementById('total').innerText = Math.round(total).toLocaleString('ar-EG');
         }
     </script>
 </body>
