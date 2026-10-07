@@ -70,6 +70,18 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
 .input-group input { flex: 2; }
 .input-group select { flex: 1; }
 
+.ref-price {
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.ref-price-label { display: block; font-size: 12px; color: #999; margin-bottom: 4px; }
+.ref-price-value { font-size: 20px; font-weight: 700; color: #d4af37; }
+.ref-price-time { display: block; font-size: 11px; color: #777; margin-top: 4px; }
+
 .price-disclaimer {
   font-size: 12.5px;
   color: #999;
@@ -154,6 +166,12 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
     <img src="https://alquds-jewelry.github.io/gold-calculator/logo.png" alt="مجوهرات القدس">
   </div>
   <h2>احسب سعر قطعتك</h2>
+
+  <div class="ref-price" id="refPrice" style="display:none;">
+    <span class="ref-price-label">سعر عيار 21 المرجعي اليوم</span>
+    <span class="ref-price-value" id="refPriceValue">—</span>
+    <span class="ref-price-time" id="refPriceTime"></span>
+  </div>
 
   <label>سعر الجرام الذي تعرفه:</label>
   <div class="input-group">
@@ -296,7 +314,22 @@ function shareCalculator() {
   }
 }
 
-window.onload = renderPieces;
+function loadReferencePrice() {
+  fetch('price.json?t=' + Date.now())
+    .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
+    .then(function(data) {
+      if (!data || !data.karat21_sell) return;
+      document.getElementById('refPriceValue').innerText = Math.round(data.karat21_sell).toLocaleString('ar-EG') + ' جنيه';
+      document.getElementById('refPriceTime').innerText = 'آخر تحديث: ' + (data.updated_at_display || '');
+      document.getElementById('refPrice').style.display = 'block';
+    })
+    .catch(function() { /* fail silently - box stays hidden */ });
+}
+
+window.onload = function() {
+  renderPieces();
+  loadReferencePrice();
+};
 </script>
 </body>
 </html>
