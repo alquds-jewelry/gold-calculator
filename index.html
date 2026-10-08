@@ -154,6 +154,8 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
 
 .note { font-size: 14px; color: #cccccc; text-align: center; margin-top: 25px; margin-bottom: -10px; line-height: 1.6; font-weight: bold; }
 
+.note-alert { font-size: 13px; color: #e8973a; text-align: center; margin-top: 16px; margin-bottom: -6px; line-height: 1.6; font-weight: bold; }
+
 .social-links { margin-top: 25px; display: flex; justify-content: space-around; border-top: 1px solid #444; padding-top: 20px; }
 .social-links a { color: #d4af37; text-decoration: none; font-size: 13px; font-weight: bold; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .social-links a i { font-size: 22px; }
@@ -168,12 +170,12 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
   <h2>احسب سعر قطعتك</h2>
 
   <div class="ref-price" id="refPrice" style="display:none;">
-    <span class="ref-price-label">سعر عيار 21 المرجعي اليوم</span>
+    <span class="ref-price-label">سعر عيار 21 المرجعي</span>
     <span class="ref-price-value" id="refPriceValue">—</span>
     <span class="ref-price-time" id="refPriceTime"></span>
   </div>
 
-  <label>سعر الجرام الذي تعرفه:</label>
+  <label>أدخل سعر الجرام الآن:</label>
   <div class="input-group">
     <input type="number" id="enteredPrice" placeholder="السعر" oninput="calculate()">
     <select id="enteredKarat" onchange="calculate()">
@@ -212,6 +214,8 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
   <div class="share-btn-wrap">
     <button class="share-btn" onclick="shareCalculator()">شاركوا الحاسبة وسهلوا على صحابكم</button>
   </div>
+
+  <p class="note-alert">في حالة بيع الذهب الرجاء العلم أنه يتم خصم نسبة بسيطة من سعر الجرام</p>
 
   <p class="note">لمتابعة أسعار الذهب أول بأول ومعرفة أسعار المصنعيات<br>تواصلوا معانا على اللينكات دي:</p>
   <div class="social-links">
