@@ -156,6 +156,37 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
 
 .note-alert { font-size: 13px; color: #e8973a; text-align: center; margin-top: 16px; margin-bottom: -6px; line-height: 1.6; font-weight: bold; }
 
+.mode-toggle {
+  display: flex;
+  background-color: #2a2a2a;
+  border: 1px solid #d4af37;
+  border-radius: 30px;
+  padding: 4px;
+  margin-bottom: 22px;
+  gap: 4px;
+}
+.mode-btn {
+  flex: 1;
+  padding: 10px 0;
+  background: transparent;
+  border: none;
+  border-radius: 26px;
+  color: #d4af37;
+  font-family: 'El Messiri', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.mode-btn.active {
+  background: linear-gradient(135deg, #d4af37, #f1c40f);
+  color: #121212;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.35);
+}
+
+body.sell-mode .buy-only { display: none !important; }
+body:not(.sell-mode) .sell-only { display: none !important; }
+
 .social-links { margin-top: 25px; display: flex; justify-content: space-around; border-top: 1px solid #444; padding-top: 20px; }
 .social-links a { color: #d4af37; text-decoration: none; font-size: 13px; font-weight: bold; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .social-links a i { font-size: 22px; }
@@ -168,6 +199,11 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
     <img src="https://alquds-jewelry.github.io/gold-calculator/logo.png" alt="مجوهرات القدس">
   </div>
   <h2>احسب سعر قطعتك</h2>
+
+  <div class="mode-toggle" role="tablist">
+    <button type="button" class="mode-btn active" id="modeBuy" onclick="setMode('buy')">هشتري ذهب</button>
+    <button type="button" class="mode-btn" id="modeSell" onclick="setMode('sell')">هبيع ذهب</button>
+  </div>
 
   <div class="ref-price" id="refPrice" style="display:none;">
     <span class="ref-price-label">سعر عيار 21 المرجعي</span>
@@ -203,7 +239,7 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
       <span>إجمالي سعر الذهب:</span>
       <span class="detail-value"><span id="goldTotal">0</span> جنيه</span>
     </div>
-    <div class="detail-row">
+    <div class="detail-row buy-only">
       <span>إجمالي المصنعية:</span>
       <span class="detail-value"><span id="makingTotal">0</span> جنيه</span>
     </div>
@@ -215,7 +251,7 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
     <button class="share-btn" onclick="shareCalculator()">شاركوا الحاسبة وسهلوا على صحابكم</button>
   </div>
 
-  <p class="note-alert">في حالة بيع الذهب الرجاء العلم أنه يتم خصم نسبة بسيطة من سعر الجرام</p>
+  <p class="note-alert sell-only">في حالة بيع الذهب الرجاء العلم أنه يتم خصم نسبة بسيطة من سعر الجرام</p>
 
   <p class="note">لمتابعة أسعار الذهب أول بأول ومعرفة أسعار المصنعيات<br>تواصلوا معانا على اللينكات دي:</p>
   <div class="social-links">
@@ -239,6 +275,18 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
 </div>
 
 <script>
+function isSellMode() {
+  return document.body.classList.contains('sell-mode');
+}
+
+function setMode(mode) {
+  const sell = mode === 'sell';
+  document.body.classList.toggle('sell-mode', sell);
+  document.getElementById('modeBuy').classList.toggle('active', !sell);
+  document.getElementById('modeSell').classList.toggle('active', sell);
+  calculate();
+}
+
 function renderPieces() {
   const count = parseInt(document.getElementById('pieceCount').value) || 1;
   const container = document.getElementById('piecesContainer');
@@ -257,8 +305,8 @@ function renderPieces() {
       </select>
       <label>وزن القطعة (جرام):</label>
       <input type="number" id="weight-${i}" placeholder="مثال: 10" oninput="calculate()">
-      <label>مصنعية الجرام (جنيه):</label>
-      <input type="number" id="makingCharge-${i}" placeholder="مثال: 100" oninput="calculate()">
+      <label class="buy-only">مصنعية الجرام (جنيه):</label>
+      <input class="buy-only" type="number" id="makingCharge-${i}" placeholder="مثال: 100" oninput="calculate()">
       <div class="piece-subtotal">سعر هذه القطعة: <span id="pieceTotal-${i}">0</span> جنيه</div>
     `;
     container.appendChild(card);
@@ -282,7 +330,7 @@ function calculate() {
 
     const targetKarat = parseFloat(targetKaratEl.value) || 0;
     const weight = parseFloat(weightEl.value) || 0;
-    const charge = parseFloat(chargeEl.value) || 0;
+    const charge = isSellMode() ? 0 : (parseFloat(chargeEl.value) || 0);
 
     const actualGramPrice = enteredKarat ? (enteredPrice / enteredKarat) * targetKarat : 0;
     const goldTotal = actualGramPrice * weight;
