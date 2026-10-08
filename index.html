@@ -78,9 +78,18 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
   margin-bottom: 20px;
   text-align: center;
 }
-.ref-price-label { display: block; font-size: 12px; color: #999; margin-bottom: 4px; }
-.ref-price-value { font-size: 20px; font-weight: 700; color: #d4af37; }
-.ref-price-time { display: block; font-size: 11px; color: #777; margin-top: 4px; }
+.ref-price-label { display: block; font-size: 12px; color: #999; margin-bottom: 8px; }
+.ref-price-grid { display: flex; justify-content: space-between; gap: 8px; }
+.ref-price-item {
+  flex: 1;
+  background-color: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 8px 4px;
+}
+.ref-price-karat { display: block; font-size: 11px; color: #999; margin-bottom: 2px; }
+.ref-price-value { font-size: 15px; font-weight: 700; color: #d4af37; }
+.ref-price-time { display: block; font-size: 11px; color: #777; margin-top: 8px; }
 
 .price-disclaimer {
   font-size: 12.5px;
@@ -206,8 +215,21 @@ body:not(.sell-mode) .sell-only { display: none !important; }
   </div>
 
   <div class="ref-price" id="refPrice" style="display:none;">
-    <span class="ref-price-label">سعر عيار 21 المرجعي</span>
-    <span class="ref-price-value" id="refPriceValue">—</span>
+    <span class="ref-price-label">الأسعار المرجعية اليوم (شراء)</span>
+    <div class="ref-price-grid">
+      <div class="ref-price-item">
+        <span class="ref-price-karat">18 عيار</span>
+        <span class="ref-price-value" id="refPriceValue18">—</span>
+      </div>
+      <div class="ref-price-item">
+        <span class="ref-price-karat">21 عيار</span>
+        <span class="ref-price-value" id="refPriceValue21">—</span>
+      </div>
+      <div class="ref-price-item">
+        <span class="ref-price-karat">24 عيار</span>
+        <span class="ref-price-value" id="refPriceValue24">—</span>
+      </div>
+    </div>
     <span class="ref-price-time" id="refPriceTime"></span>
   </div>
 
@@ -371,7 +393,9 @@ function loadReferencePrice() {
     .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
     .then(function(data) {
       if (!data || !data.karat21_buy) return;
-      document.getElementById('refPriceValue').innerText = Math.round(data.karat21_buy).toLocaleString('ar-EG') + ' جنيه';
+      document.getElementById('refPriceValue18').innerText = Math.round(data.karat18_buy).toLocaleString('ar-EG');
+      document.getElementById('refPriceValue21').innerText = Math.round(data.karat21_buy).toLocaleString('ar-EG');
+      document.getElementById('refPriceValue24').innerText = Math.round(data.karat24_buy).toLocaleString('ar-EG');
       document.getElementById('refPriceTime').innerText = 'آخر تحديث: ' + (data.updated_at_display || '');
       document.getElementById('refPrice').style.display = 'block';
     })
