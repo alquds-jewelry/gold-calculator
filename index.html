@@ -13,6 +13,16 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 
+<!-- PWA: يسمح للعميل يضيف الحاسبة كأيقونة على شاشة موبايله -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#121212">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="حاسبة الذهب">
+
 <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -28,7 +38,14 @@
 <style>
 body {
   font-family: 'El Messiri', sans-serif;
-  background-color: #121212;
+  background-color: #0d0d0d;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(212,175,55,0.07), transparent 38%),
+    radial-gradient(circle at 85% 0%, rgba(212,175,55,0.05), transparent 35%),
+    radial-gradient(circle at 50% 100%, rgba(212,175,55,0.07), transparent 48%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 58px),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 58px);
+  background-attachment: fixed;
   color: #d4af37;
   padding: 20px;
   display: flex;
@@ -46,9 +63,44 @@ body {
   width: 100%;
   border: 1px solid #d4af37;
 }
-.logo-container { text-align: center; margin-bottom: 20px; }
-.logo-container img { max-width: 120px; border-radius: 10px; }
-h2 { text-align: center; margin-bottom: 25px; font-weight: 700; }
+.logo-container { width: 130px; margin: 0 auto 20px; position: relative; overflow: hidden; border-radius: 10px; }
+.logo-container img { width: 100%; display: block; border-radius: 10px; }
+.logo-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent 15%, rgba(255,255,255,0.45) 50%, transparent 85%);
+  transform: skewX(-20deg);
+  animation: logoShine 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes logoShine {
+  0% { left: -60%; }
+  35% { left: 140%; }
+  100% { left: 140%; }
+}
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 700;
+  background: linear-gradient(100deg, #d4af37 35%, #fbe9b0 50%, #d4af37 65%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmerText 5s linear infinite;
+}
+@keyframes shimmerText {
+  0% { background-position: 220% center; }
+  100% { background-position: -220% center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-container::after { animation: none; display: none; }
+  h2 { animation: none; background-position: 0 center; }
+}
 h3 { margin: 0 0 12px; font-weight: 700; color: #f5f5f5; font-size: 16px; }
 label { font-weight: bold; display: block; margin-bottom: 8px; color: #f5f5f5; }
 input, select {
@@ -161,6 +213,72 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
 }
 .share-btn:hover { background: #d4af37; color: #121212; }
 
+.invoice-share-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 12px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #d4af37, #f1c40f);
+  border: none;
+  color: #121212;
+  border-radius: 10px;
+  font-family: 'El Messiri', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.3s;
+}
+.invoice-share-btn:hover { filter: brightness(1.08); }
+.invoice-share-btn:active { transform: scale(0.98); }
+
+.use-ref-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: -10px 0 20px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px dashed #d4af37;
+  color: #d4af37;
+  border-radius: 8px;
+  font-family: 'El Messiri', sans-serif;
+  font-size: 13.5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+}
+.use-ref-btn:hover { background: rgba(212, 175, 55, 0.12); }
+.use-ref-btn:active { transform: scale(0.98); }
+
+.install-btn-wrap { text-align: center; margin-top: 10px; }
+.install-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: transparent;
+  border: 1px solid #555;
+  color: #ccc;
+  border-radius: 20px;
+  font-family: 'El Messiri', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.install-btn:hover { border-color: #d4af37; color: #d4af37; }
+
+.hidden { display: none !important; }
+
 .note { font-size: 14px; color: #cccccc; text-align: center; margin-top: 25px; margin-bottom: -10px; line-height: 1.6; font-weight: bold; }
 
 .note-alert { font-size: 13px; color: #e8973a; text-align: center; margin-top: 16px; margin-bottom: -6px; line-height: 1.6; font-weight: bold; }
@@ -236,12 +354,15 @@ body:not(.sell-mode) .sell-only { display: none !important; }
   <label>أدخل سعر الجرام الآن:</label>
   <div class="input-group">
     <input type="number" id="enteredPrice" placeholder="السعر" oninput="calculate()">
-    <select id="enteredKarat" onchange="calculate()">
+    <select id="enteredKarat" onchange="onKaratChange()">
       <option value="21">21 عيار</option>
       <option value="24">24 عيار</option>
       <option value="18">18 عيار</option>
     </select>
   </div>
+  <button type="button" class="use-ref-btn hidden" id="useRefBtn" onclick="useReferencePrice()">
+    <i class="fa-solid fa-bolt"></i> <span id="useRefBtnLabel">استخدم السعر المرجعي</span>
+  </button>
   <p class="price-disclaimer">السعر يتغير لحظياً حسب السوق، تواصل معانا للتأكيد</p>
 
   <label>عدد القطع:</label>
@@ -269,8 +390,18 @@ body:not(.sell-mode) .sell-only { display: none !important; }
 
   <div class="result">الإجمالي النهائي: <span id="total">0</span> جنيه</div>
 
+  <button type="button" class="invoice-share-btn hidden" id="invoiceShareBtn" onclick="shareInvoiceImage()">
+    <i class="fa-solid fa-file-invoice"></i> شارك السعر كصورة فاتورة
+  </button>
+
   <div class="share-btn-wrap">
     <button class="share-btn" onclick="shareCalculator()">شاركوا الحاسبة وسهلوا على صحابكم</button>
+  </div>
+
+  <div class="install-btn-wrap">
+    <button type="button" class="install-btn" id="installBtn" onclick="installApp()">
+      <i class="fa-solid fa-mobile-screen-button"></i> ثبّت الحاسبة على موبايلك
+    </button>
   </div>
 
   <p class="note-alert sell-only">في حالة بيع الذهب الرجاء العلم أنه يتم خصم نسبة بسيطة من سعر الجرام</p>
@@ -307,6 +438,45 @@ function setMode(mode) {
   document.getElementById('modeBuy').classList.toggle('active', !sell);
   document.getElementById('modeSell').classList.toggle('active', sell);
   calculate();
+}
+
+// ---------- حركة الأرقام (count-up) ----------
+const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const activeNumberAnimations = {};
+
+function animateValue(el, rawTo) {
+  if (!el) return;
+  const to = Math.round(rawTo) || 0;
+  const from = parseFloat(el.dataset.rawValue || '0') || 0;
+
+  if (activeNumberAnimations[el.id]) {
+    cancelAnimationFrame(activeNumberAnimations[el.id]);
+    delete activeNumberAnimations[el.id];
+  }
+
+  if (prefersReducedMotion || from === to) {
+    el.innerText = to.toLocaleString('ar-EG');
+    el.dataset.rawValue = to;
+    return;
+  }
+
+  const duration = 350;
+  const start = performance.now();
+
+  function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const current = Math.round(from + (to - from) * eased);
+    el.innerText = current.toLocaleString('ar-EG');
+    if (t < 1) {
+      activeNumberAnimations[el.id] = requestAnimationFrame(step);
+    } else {
+      el.innerText = to.toLocaleString('ar-EG');
+      el.dataset.rawValue = to;
+      delete activeNumberAnimations[el.id];
+    }
+  }
+  activeNumberAnimations[el.id] = requestAnimationFrame(step);
 }
 
 function renderPieces() {
@@ -362,17 +532,46 @@ function calculate() {
     goldSum += goldTotal;
     makingSum += makingTotal;
 
-    document.getElementById(`pieceTotal-${i}`).innerText = Math.round(pieceTotal).toLocaleString('ar-EG');
+    animateValue(document.getElementById(`pieceTotal-${i}`), pieceTotal);
   }
 
   const finalTotal = goldSum + makingSum;
 
-  document.getElementById('goldTotal').innerText = Math.round(goldSum).toLocaleString('ar-EG');
-  document.getElementById('makingTotal').innerText = Math.round(makingSum).toLocaleString('ar-EG');
-  document.getElementById('total').innerText = Math.round(finalTotal).toLocaleString('ar-EG');
+  animateValue(document.getElementById('goldTotal'), goldSum);
+  animateValue(document.getElementById('makingTotal'), makingSum);
+  animateValue(document.getElementById('total'), finalTotal);
 
-  const detailsBox = document.getElementById('invoiceDetails');
-  detailsBox.style.display = (enteredPrice > 0 && finalTotal > 0) ? 'block' : 'none';
+  const showDetails = enteredPrice > 0 && finalTotal > 0;
+  document.getElementById('invoiceDetails').style.display = showDetails ? 'block' : 'none';
+  document.getElementById('invoiceShareBtn').classList.toggle('hidden', !showDetails);
+}
+
+// ---------- زرار "استخدم السعر المرجعي" ----------
+let referencePriceData = null;
+
+function onKaratChange() {
+  updateUseRefButtonLabel();
+  calculate();
+}
+
+function updateUseRefButtonLabel() {
+  const btn = document.getElementById('useRefBtn');
+  if (!referencePriceData) { btn.classList.add('hidden'); return; }
+  const karat = document.getElementById('enteredKarat').value;
+  const price = referencePriceData[`karat${karat}_buy`];
+  if (!price) { btn.classList.add('hidden'); return; }
+  document.getElementById('useRefBtnLabel').innerText =
+    `استخدم سعر اليوم (${karat} عيار — ${Math.round(price).toLocaleString('ar-EG')} جنيه)`;
+  btn.classList.remove('hidden');
+}
+
+function useReferencePrice() {
+  if (!referencePriceData) return;
+  const karat = document.getElementById('enteredKarat').value;
+  const price = referencePriceData[`karat${karat}_buy`];
+  if (!price) return;
+  document.getElementById('enteredPrice').value = Math.round(price);
+  calculate();
 }
 
 function shareCalculator() {
@@ -393,18 +592,312 @@ function loadReferencePrice() {
     .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
     .then(function(data) {
       if (!data || !data.karat21_buy) return;
+      referencePriceData = data;
       document.getElementById('refPriceValue18').innerText = Math.round(data.karat18_buy).toLocaleString('ar-EG');
       document.getElementById('refPriceValue21').innerText = Math.round(data.karat21_buy).toLocaleString('ar-EG');
       document.getElementById('refPriceValue24').innerText = Math.round(data.karat24_buy).toLocaleString('ar-EG');
       document.getElementById('refPriceTime').innerText = 'آخر تحديث: ' + (data.updated_at_display || '');
       document.getElementById('refPrice').style.display = 'block';
+      updateUseRefButtonLabel();
     })
     .catch(function() { /* fail silently - box stays hidden */ });
+}
+
+// ---------- مشاركة السعر كصورة فاتورة ----------
+function collectInvoicePieces() {
+  const count = parseInt(document.getElementById('pieceCount').value) || 1;
+  const pieces = [];
+  for (let i = 1; i <= count; i++) {
+    const karatEl = document.getElementById(`targetKarat-${i}`);
+    const weightEl = document.getElementById(`weight-${i}`);
+    const totalEl = document.getElementById(`pieceTotal-${i}`);
+    if (!karatEl || !weightEl || !totalEl) continue;
+    const weight = parseFloat(weightEl.value) || 0;
+    if (weight <= 0) continue;
+    pieces.push({
+      index: i,
+      karat: karatEl.value,
+      weight: weight,
+      total: parseFloat(totalEl.dataset.rawValue || '0') || 0
+    });
+  }
+  return pieces;
+}
+
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+async function buildInvoiceCanvas() {
+  const pieces = collectInvoicePieces();
+  const enteredPrice = parseFloat(document.getElementById('enteredPrice').value) || 0;
+  const enteredKarat = document.getElementById('enteredKarat').value;
+  const sell = isSellMode();
+  const goldTotal = parseFloat(document.getElementById('goldTotal').dataset.rawValue || '0') || 0;
+  const makingTotal = parseFloat(document.getElementById('makingTotal').dataset.rawValue || '0') || 0;
+  const finalTotal = parseFloat(document.getElementById('total').dataset.rawValue || '0') || 0;
+
+  if (typeof document.fonts !== 'undefined' && document.fonts.ready) {
+    try { await document.fonts.ready; } catch (e) {}
+  }
+
+  const scale = 2;
+  const width = 1000;
+  const rowH = 54;
+  const height = 760 + pieces.length * rowH;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+  ctx.direction = 'rtl';
+
+  // خلفية
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+  bgGrad.addColorStop(0, '#1e1e1e');
+  bgGrad.addColorStop(1, '#141414');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, width, height);
+
+  roundRectPath(ctx, 14, 14, width - 28, height - 28, 18);
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const marginR = width - 60;
+  let y = 90;
+
+  // لوجو
+  try {
+    const logoImg = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = 'logo.png';
+    });
+    const logoSize = 90;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(width / 2, y, logoSize / 2, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(logoImg, width / 2 - logoSize / 2, y - logoSize / 2, logoSize, logoSize);
+    ctx.restore();
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(width / 2, y, logoSize / 2, 0, Math.PI * 2);
+    ctx.stroke();
+  } catch (e) { /* يتجاهل اللوجو لو فشل التحميل */ }
+
+  y += 75;
+  ctx.fillStyle = '#d4af37';
+  ctx.font = "bold 30px 'El Messiri', sans-serif";
+  ctx.textAlign = 'center';
+  ctx.fillText('مجوهرات القدس', width / 2, y);
+
+  y += 32;
+  ctx.fillStyle = '#ccc';
+  ctx.font = "16px 'El Messiri', sans-serif";
+  ctx.fillText(sell ? 'فاتورة بيع ذهب (مبدئية)' : 'فاتورة شراء ذهب (مبدئية)', width / 2, y);
+
+  y += 40;
+  ctx.strokeStyle = 'rgba(212,175,55,0.35)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(60, y);
+  ctx.lineTo(width - 60, y);
+  ctx.stroke();
+
+  y += 42;
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#f5f5f5';
+  ctx.font = "bold 20px 'El Messiri', sans-serif";
+  ctx.fillText(`سعر الجرام المُدخل (عيار ${enteredKarat}):`, marginR, y);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#d4af37';
+  ctx.fillText(`${Math.round(enteredPrice).toLocaleString('ar-EG')} جنيه`, 60, y);
+
+  y += 36;
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.beginPath();
+  ctx.moveTo(60, y);
+  ctx.lineTo(width - 60, y);
+  ctx.stroke();
+
+  // القطع
+  pieces.forEach((p) => {
+    y += rowH;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#e8e8e8';
+    ctx.font = "18px 'El Messiri', sans-serif";
+    ctx.fillText(`القطعة ${p.index} — عيار ${p.karat} — الوزن ${p.weight} جم`, marginR, y);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#d4af37';
+    ctx.font = "bold 18px 'El Messiri', sans-serif";
+    ctx.fillText(`${Math.round(p.total).toLocaleString('ar-EG')} جنيه`, 60, y);
+  });
+
+  y += 40;
+  ctx.strokeStyle = 'rgba(212,175,55,0.35)';
+  ctx.beginPath();
+  ctx.moveTo(60, y);
+  ctx.lineTo(width - 60, y);
+  ctx.stroke();
+
+  y += 42;
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#ccc';
+  ctx.font = "17px 'El Messiri', sans-serif";
+  ctx.fillText('إجمالي سعر الذهب:', marginR, y);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#eee';
+  ctx.fillText(`${Math.round(goldTotal).toLocaleString('ar-EG')} جنيه`, 60, y);
+
+  if (!sell) {
+    y += 34;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#ccc';
+    ctx.fillText('إجمالي المصنعية:', marginR, y);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#eee';
+    ctx.fillText(`${Math.round(makingTotal).toLocaleString('ar-EG')} جنيه`, 60, y);
+  }
+
+  y += 40;
+  const boxH = 70;
+  const boxTop = y;
+  const boxGrad = ctx.createLinearGradient(60, boxTop, width - 60, boxTop + boxH);
+  boxGrad.addColorStop(0, '#d4af37');
+  boxGrad.addColorStop(1, '#f1c40f');
+  roundRectPath(ctx, 60, boxTop, width - 120, boxH, 10);
+  ctx.fillStyle = boxGrad;
+  ctx.fill();
+  ctx.fillStyle = '#121212';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = "bold 26px 'El Messiri', sans-serif";
+  ctx.fillText(`الإجمالي النهائي: ${Math.round(finalTotal).toLocaleString('ar-EG')} جنيه`, width / 2, boxTop + boxH / 2);
+  ctx.textBaseline = 'alphabetic';
+
+  y = boxTop + boxH + 44;
+  ctx.fillStyle = '#888';
+  ctx.font = "13px 'El Messiri', sans-serif";
+  ctx.textAlign = 'center';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ar-EG', { timeZone: 'Africa/Cairo', day: 'numeric', month: 'long', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('ar-EG', { timeZone: 'Africa/Cairo', hour: 'numeric', minute: '2-digit' });
+  ctx.fillText(`تم الإنشاء: ${dateStr} - ${timeStr}`, width / 2, y);
+  y += 22;
+  ctx.fillText('السعر لحظي وقابل للتغير حسب السوق - للتأكيد تواصلوا معانا', width / 2, y);
+  y += 22;
+  ctx.fillStyle = '#d4af37';
+  ctx.font = "bold 13px 'El Messiri', sans-serif";
+  ctx.fillText('alquds-jewelry.github.io/gold-calculator', width / 2, y);
+
+  return canvas;
+}
+
+function shareInvoiceImage() {
+  const pieces = collectInvoicePieces();
+  if (pieces.length === 0) {
+    alert('حط وزن القطعة الأول عشان نقدر نجهز صورة الفاتورة');
+    return;
+  }
+
+  const btn = document.getElementById('invoiceShareBtn');
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> بنجهز الصورة...';
+
+  buildInvoiceCanvas()
+    .then((canvas) => {
+      canvas.toBlob(async (blob) => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        if (!blob) return;
+        const fileName = 'فاتورة-مجوهرات-القدس.png';
+        const file = new File([blob], fileName, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'فاتورة مجوهرات القدس',
+              text: 'سعر القطعة من حاسبة مجوهرات القدس'
+            });
+            return;
+          } catch (e) { /* المستخدم قفل نافذة المشاركة أو فشلت - هننزل الصورة بدلاً */ }
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      }, 'image/png');
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+      alert('معلش، حصلت مشكلة في تجهيز صورة الفاتورة. جرب تاني.');
+    });
+}
+
+// ---------- تثبيت الحاسبة على الشاشة الرئيسية (PWA) ----------
+let deferredInstallPrompt = null;
+
+function isStandaloneDisplay() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  document.getElementById('installBtn').classList.add('hidden');
+});
+
+function installApp() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.finally(() => { deferredInstallPrompt = null; });
+    return;
+  }
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (isIOS) {
+    alert('لإضافة الحاسبة لشاشتك الرئيسية: دوس على زرار المشاركة ⬆️ تحت في المتصفح، واختار "إضافة إلى الشاشة الرئيسية".');
+  } else {
+    alert('لإضافة الحاسبة لشاشتك الرئيسية: افتح قائمة المتصفح (⋮) واختار "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية".');
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
 }
 
 window.onload = function() {
   renderPieces();
   loadReferencePrice();
+  if (isStandaloneDisplay()) {
+    document.getElementById('installBtn').classList.add('hidden');
+  }
 };
 </script>
 </body>
