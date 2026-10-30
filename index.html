@@ -614,9 +614,22 @@ function shareCalculator() {
   }
 }
 
-function loadReferencePrice() {
-  fetch('price.json?t=' + Date.now())
+// بنقرا الأسعار من GitHub مباشرة (بتتحدث لحظة ما الأسعار تتغير)، ولو فشل نرجع للنسخة اللي على الموقع.
+const PRICE_SOURCES = [
+  'https://raw.githubusercontent.com/alquds-jewelry/gold-calculator/main/price.json',
+  'price.json'
+];
+
+function fetchPriceJson(index) {
+  if (index >= PRICE_SOURCES.length) return Promise.reject();
+  return fetch(PRICE_SOURCES[index] + '?t=' + Date.now(), { cache: 'no-store' })
     .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
+    .then(function(data) { return (data && data.karat21_buy) ? data : Promise.reject(); })
+    .catch(function() { return fetchPriceJson(index + 1); });
+}
+
+function loadReferencePrice() {
+  fetchPriceJson(0)
     .then(function(data) {
       if (!data || !data.karat21_buy) return;
       referencePriceData = data;

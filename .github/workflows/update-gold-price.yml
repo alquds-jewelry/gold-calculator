@@ -1,0 +1,54 @@
+name: تحديث أسعار الذهب
+
+on:
+  schedule:
+    - cron: "7 */2 * * *"   # every 2 hours (UTC), at minute 7
+  workflow_dispatch:        # "Run workflow" button in the Actions tab
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/update-gold-price.yml"
+      - ".github/scripts/update_price.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gold-price-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch prices from goldbullioneg.com
+        id: update
+        run: python3 .github/scripts/update_price.py
+
+      - name: Commit and push
+        if: always()
+        env:
+          MSG: ${{ steps.update.outputs.message }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A price.json debug
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "${MSG:-Gold price update}"
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push origin HEAD:main && exit 0
+            sleep 10
+          done
+          exit 1
+
+      - name: Mark run as failed when prices were not updated
+        if: steps.update.outputs.status != 'ok'
+        run: |
+          echo "${{ steps.update.outputs.message }}"
+          exit 1
