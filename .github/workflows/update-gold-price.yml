@@ -2,7 +2,10 @@ name: تحديث أسعار الذهب
 
 on:
   schedule:
-    - cron: "7 */2 * * *"   # every 2 hours (UTC), at minute 7
+    # Every 30 minutes. GitHub's scheduler often delays or skips runs, so asking for
+    # more runs keeps prices at most ~2 hours old; the script only commits when the
+    # price changed or the last update is ~2 hours old.
+    - cron: "11,41 * * * *"
   workflow_dispatch:        # "Run workflow" button in the Actions tab
   push:
     branches: [main]

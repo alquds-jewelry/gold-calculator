@@ -229,6 +229,20 @@ def main():
         "updated_at_display": arabic_display(now),
         "source": SOURCE_NAME,
     }
+    # GitHub runs this job every 30 minutes (its scheduler often skips runs), but we only
+    # commit when the price changed or the last saved update is ~2 hours old.
+    keys = [k for k in data if k.startswith("karat")]
+    same_prices = all(previous.get(k) == data[k] for k in keys)
+    if same_prices and prev_time:
+        try:
+            since = now - datetime.datetime.fromisoformat(prev_time)
+        except ValueError:
+            since = datetime.timedelta(days=999)
+        if since < datetime.timedelta(minutes=110):
+            set_output("status", "ok")
+            set_output("message", "Prices unchanged; nothing to commit")
+            return
+
     write_json(PRICE_FILE, data)
 
     os.makedirs(DEBUG_DIR, exist_ok=True)
