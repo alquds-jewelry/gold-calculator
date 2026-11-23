@@ -353,7 +353,7 @@ body:not(.sell-mode) .sell-only { display: none !important; }
 
   <label>أدخل سعر الجرام الآن:</label>
   <div class="input-group">
-    <input type="number" id="enteredPrice" placeholder="السعر" oninput="calculate()">
+    <input type="number" id="enteredPrice" placeholder="السعر" oninput="onEnteredPriceInput()">
     <select id="enteredKarat" onchange="onKaratChange()">
       <option value="21">21 عيار</option>
       <option value="24">24 عيار</option>
@@ -439,16 +439,18 @@ function setMode(mode) {
   document.getElementById('modeSell').classList.toggle('active', sell);
   updateRefPriceDisplay();
   updateUseRefButtonLabel();
+  syncReferencePriceIfActive();
   calculate();
 }
 
-// الزبون بيبيع لينا → إحنا بنشتري منه → ناخد سعر "شراء" من السوق.
-// الزبون بيشتري منا → إحنا بنبيعله → ناخد سعر "بيع" من السوق.
+// هشتري ذهب (الزبون هيشتري منّا) → نوريه سعر "الشراء" (karat*_buy).
+// هبيع ذهب (الزبون هيبيعلنا، يعني إحنا اللي هنشتري منه) → نوريه سعر "البيع" (karat*_sell) اللي هو
+// السعر اللي إحنا بنشتري بيه الدهب من الزبون.
 function refPriceFieldSuffix() {
-  return isSellMode() ? '_buy' : '_sell';
+  return isSellMode() ? '_sell' : '_buy';
 }
 function refPriceLabelArabic() {
-  return isSellMode() ? 'شراء' : 'بيع';
+  return isSellMode() ? 'بيع' : 'شراء';
 }
 
 // ---------- حركة الأرقام (count-up) ----------
@@ -559,10 +561,28 @@ function calculate() {
 
 // ---------- زرار "استخدم السعر المرجعي" ----------
 let referencePriceData = null;
+// true لما السعر المدخل يكون جاي من الزرار (مش كتبه الزبون بإيده)، وده اللي بيخلينا
+// نحدّثه تلقائي لو العيار اتغير أو المستخدم بدّل بين "هشتري/هبيع ذهب".
+let usingReferencePrice = false;
 
 function onKaratChange() {
   updateUseRefButtonLabel();
+  syncReferencePriceIfActive();
   calculate();
+}
+
+function onEnteredPriceInput() {
+  // المستخدم بقى بيكتب السعر بإيده، يبقى نسيبه عليه ومش هنلخبطه لما يبدّل الوضع.
+  usingReferencePrice = false;
+  calculate();
+}
+
+function syncReferencePriceIfActive() {
+  if (!usingReferencePrice) return;
+  const karat = document.getElementById('enteredKarat').value;
+  const price = referencePriceFor(karat);
+  if (!price) return;
+  document.getElementById('enteredPrice').value = Math.round(price);
 }
 
 function referencePriceFor(karat) {
@@ -588,6 +608,7 @@ function useReferencePrice() {
   const price = referencePriceFor(karat);
   if (!price) return;
   document.getElementById('enteredPrice').value = Math.round(price);
+  usingReferencePrice = true;
   calculate();
 }
 
