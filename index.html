@@ -333,7 +333,7 @@ body:not(.sell-mode) .sell-only { display: none !important; }
   </div>
 
   <div class="ref-price" id="refPrice" style="display:none;">
-    <span class="ref-price-label" id="refPriceLabel">الأسعار المرجعية اليوم (شراء)</span>
+    <span class="ref-price-label" id="refPriceLabel">الأسعار المرجعية اليوم (بيع)</span>
     <div class="ref-price-grid">
       <div class="ref-price-item">
         <span class="ref-price-karat">18 عيار</span>
@@ -443,14 +443,18 @@ function setMode(mode) {
   calculate();
 }
 
-// هشتري ذهب (الزبون هيشتري منّا) → نوريه سعر "الشراء" (karat*_buy).
-// هبيع ذهب (الزبون هيبيعلنا، يعني إحنا اللي هنشتري منه) → نوريه سعر "البيع" (karat*_sell) اللي هو
-// السعر اللي إحنا بنشتري بيه الدهب من الزبون.
-function refPriceFieldSuffix() {
-  return isSellMode() ? '_sell' : '_buy';
-}
+// هشتري ذهب (الزبون هيشتري منّا) → نوريه سعر "البيع" = السعر الأعلى.
+// هبيع ذهب (الزبون هيبيعلنا) → نوريه سعر "الشراء" = السعر الأقل.
+// بنختار الأعلى/الأقل بالقيمة نفسها مش باسم الخانة، عشان لو أي مصدر قلب الاتنين يفضل الموقع صح تلقائي.
 function refPriceLabelArabic() {
-  return isSellMode() ? 'بيع' : 'شراء';
+  return isSellMode() ? 'شراء' : 'بيع';
+}
+function pickRefPrice(d, karat) {
+  if (!d) return null;
+  const vals = [d[`karat${karat}_buy`], d[`karat${karat}_sell`]]
+    .map(Number).filter(function(v) { return v > 0; });
+  if (!vals.length) return null;
+  return isSellMode() ? Math.min.apply(null, vals) : Math.max.apply(null, vals);
 }
 
 // ---------- حركة الأرقام (count-up) ----------
@@ -586,9 +590,7 @@ function syncReferencePriceIfActive() {
 }
 
 function referencePriceFor(karat) {
-  if (!referencePriceData) return null;
-  // لو السعر المطلوب (بيع مثلاً) مش متوفر لسبب ما، نرجع لسعر الشراء بدل ما نسيب الزرار مخفي.
-  return referencePriceData[`karat${karat}${refPriceFieldSuffix()}`] || referencePriceData[`karat${karat}_buy`] || null;
+  return pickRefPrice(referencePriceData, karat);
 }
 
 function updateUseRefButtonLabel() {
@@ -614,11 +616,10 @@ function useReferencePrice() {
 
 function updateRefPriceDisplay() {
   if (!referencePriceData) return;
-  const suffix = refPriceFieldSuffix();
-  const d = referencePriceData;
-  document.getElementById('refPriceValue18').innerText = Math.round(d[`karat18${suffix}`] || d.karat18_buy).toLocaleString('ar-EG');
-  document.getElementById('refPriceValue21').innerText = Math.round(d[`karat21${suffix}`] || d.karat21_buy).toLocaleString('ar-EG');
-  document.getElementById('refPriceValue24').innerText = Math.round(d[`karat24${suffix}`] || d.karat24_buy).toLocaleString('ar-EG');
+  [18, 21, 24].forEach(function(k) {
+    const v = pickRefPrice(referencePriceData, k);
+    document.getElementById('refPriceValue' + k).innerText = v ? Math.round(v).toLocaleString('ar-EG') : '—';
+  });
   document.getElementById('refPriceLabel').innerText = `الأسعار المرجعية اليوم (${refPriceLabelArabic()})`;
 }
 
