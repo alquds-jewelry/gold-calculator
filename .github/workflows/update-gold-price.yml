@@ -23,11 +23,21 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch prices from goldbullioneg.com
+      # gold-era.eg's price table is filled in by client-side JS, so that one source
+      # needs a real browser. This install is best-effort: if it fails (network hiccup,
+      # pip index issue, etc.) the job still runs, update_price.py just skips that one
+      # source and carries on with the other three.
+      - name: Install Playwright (for gold-era.eg, best-effort)
+        continue-on-error: true
+        run: |
+          pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+
+      - name: Fetch prices from goldbullioneg.com, gold-era.eg, isagha.com, bulliontradingcenter.com
         id: update
         run: python3 .github/scripts/update_price.py
 
