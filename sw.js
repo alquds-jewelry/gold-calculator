@@ -7,7 +7,7 @@
 // Rarely-changing static assets (logo, icons, manifest) are cache-first
 // for a fast, app-like load.
 
-const CACHE_NAME = 'alquds-gold-calc-v2';
+const CACHE_NAME = 'alquds-gold-calc-v3';
 const CORE_ASSETS = [
   './',
   './index.html',

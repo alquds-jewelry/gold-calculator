@@ -141,6 +141,22 @@ input:focus, select:focus { outline: none; border-color: #d4af37; box-shadow: 0 
 }
 .ref-price-karat { display: block; font-size: 11px; color: #999; margin-bottom: 2px; }
 .ref-price-value { font-size: 15px; font-weight: 700; color: #d4af37; }
+.ref-price-row {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  opacity: 0.45;
+  transition: 0.3s;
+}
+.ref-price-row:last-of-type { margin-bottom: 0; }
+.ref-price-row.active {
+  opacity: 1;
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.08);
+}
+.ref-row-title { display: block; font-size: 13px; font-weight: 700; color: #f5f5f5; margin-bottom: 6px; }
+.ref-row-title small { font-weight: 400; color: #aaa; }
 .ref-price-time { display: block; font-size: 11px; color: #777; margin-top: 8px; }
 
 .price-disclaimer {
@@ -333,19 +349,21 @@ body:not(.sell-mode) .sell-only { display: none !important; }
   </div>
 
   <div class="ref-price" id="refPrice" style="display:none;">
-    <span class="ref-price-label" id="refPriceLabel">الأسعار المرجعية اليوم (بيع)</span>
-    <div class="ref-price-grid">
-      <div class="ref-price-item">
-        <span class="ref-price-karat">18 عيار</span>
-        <span class="ref-price-value" id="refPriceValue18">—</span>
+    <span class="ref-price-label" id="refPriceLabel">أسعار الذهب اليوم</span>
+    <div class="ref-price-row active" id="refRowSell">
+      <span class="ref-row-title">سعر البيع <small>(لو هتشتري)</small></span>
+      <div class="ref-price-grid">
+        <div class="ref-price-item"><span class="ref-price-karat">18 عيار</span><span class="ref-price-value" id="refSell18">—</span></div>
+        <div class="ref-price-item"><span class="ref-price-karat">21 عيار</span><span class="ref-price-value" id="refSell21">—</span></div>
+        <div class="ref-price-item"><span class="ref-price-karat">24 عيار</span><span class="ref-price-value" id="refSell24">—</span></div>
       </div>
-      <div class="ref-price-item">
-        <span class="ref-price-karat">21 عيار</span>
-        <span class="ref-price-value" id="refPriceValue21">—</span>
-      </div>
-      <div class="ref-price-item">
-        <span class="ref-price-karat">24 عيار</span>
-        <span class="ref-price-value" id="refPriceValue24">—</span>
+    </div>
+    <div class="ref-price-row" id="refRowBuy">
+      <span class="ref-row-title">سعر الشراء <small>(لو هتبيع)</small></span>
+      <div class="ref-price-grid">
+        <div class="ref-price-item"><span class="ref-price-karat">18 عيار</span><span class="ref-price-value" id="refBuy18">—</span></div>
+        <div class="ref-price-item"><span class="ref-price-karat">21 عيار</span><span class="ref-price-value" id="refBuy21">—</span></div>
+        <div class="ref-price-item"><span class="ref-price-karat">24 عيار</span><span class="ref-price-value" id="refBuy24">—</span></div>
       </div>
     </div>
     <span class="ref-price-time" id="refPriceTime"></span>
@@ -449,12 +467,18 @@ function setMode(mode) {
 function refPriceLabelArabic() {
   return isSellMode() ? 'شراء' : 'بيع';
 }
-function pickRefPrice(d, karat) {
+// السعرين لكل عيار: high = سعر البيع (التاجر بيبيع بيه)، low = سعر الشراء (التاجر بيشتري بيه).
+function refPricePair(d, karat) {
   if (!d) return null;
   const vals = [d[`karat${karat}_buy`], d[`karat${karat}_sell`]]
     .map(Number).filter(function(v) { return v > 0; });
   if (!vals.length) return null;
-  return isSellMode() ? Math.min.apply(null, vals) : Math.max.apply(null, vals);
+  return { high: Math.max.apply(null, vals), low: Math.min.apply(null, vals) };
+}
+function pickRefPrice(d, karat) {
+  const p = refPricePair(d, karat);
+  if (!p) return null;
+  return isSellMode() ? p.low : p.high;
 }
 
 // ---------- حركة الأرقام (count-up) ----------
@@ -617,10 +641,13 @@ function useReferencePrice() {
 function updateRefPriceDisplay() {
   if (!referencePriceData) return;
   [18, 21, 24].forEach(function(k) {
-    const v = pickRefPrice(referencePriceData, k);
-    document.getElementById('refPriceValue' + k).innerText = v ? Math.round(v).toLocaleString('ar-EG') : '—';
+    const p = refPricePair(referencePriceData, k);
+    document.getElementById('refSell' + k).innerText = p ? Math.round(p.high).toLocaleString('ar-EG') : '—';
+    document.getElementById('refBuy' + k).innerText = p ? Math.round(p.low).toLocaleString('ar-EG') : '—';
   });
-  document.getElementById('refPriceLabel').innerText = `الأسعار المرجعية اليوم (${refPriceLabelArabic()})`;
+  const sell = isSellMode();
+  document.getElementById('refRowSell').classList.toggle('active', !sell);
+  document.getElementById('refRowBuy').classList.toggle('active', sell);
 }
 
 function shareCalculator() {
@@ -659,6 +686,12 @@ function loadReferencePrice() {
       document.getElementById('refPriceTime').innerText = 'آخر تحديث: ' + (data.updated_at_display || '');
       document.getElementById('refPrice').style.display = 'block';
       updateUseRefButtonLabel();
+      // نحط سعر اليوم في خانة سعر الجرام تلقائي (لو العميل مكتبش سعر)، فيتغير لوحده مع هشتري/هبيع.
+      if (!document.getElementById('enteredPrice').value) {
+        usingReferencePrice = true;
+        syncReferencePriceIfActive();
+        calculate();
+      }
     })
     .catch(function() { /* fail silently - box stays hidden */ });
 }
