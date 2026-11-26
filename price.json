@@ -1,11 +1,11 @@
 {
-  "karat18_buy": 4825.71,
-  "karat21_buy": 5630.0,
-  "karat24_buy": 6434.29,
-  "karat18_sell": 4791.43,
-  "karat21_sell": 5590.0,
-  "karat24_sell": 6388.57,
-  "updated_at": "2026-11-26T15:48:19+02:00",
-  "updated_at_display": "26 نوفمبر 2026 - 3:48 م",
-  "source": "gold-era.eg + goldbullioneg.com + isagha.com"
+  "karat18_buy": 4839,
+  "karat21_buy": 5646.65,
+  "karat24_buy": 6452.97,
+  "karat18_sell": 4808.57,
+  "karat21_sell": 5602.5,
+  "karat24_sell": 6402.84,
+  "updated_at": "2026-11-27T00:56:15+02:00",
+  "updated_at_display": "27 نوفمبر 2026 - 12:56 ص",
+  "source": "bulliontradingcenter.com + gold-era.eg + goldbullioneg.com + isagha.com"
 }
